@@ -3,6 +3,7 @@ Version 1.0.0
 App designed to take ASS(SubStation Alpha) subtitle from anime subtitle and create subtitle for only sign and songs
 
 if you are using ASS files so you don't need anything 
+/n
 1.just open the app load ASS subtitle 
 2. open tag to remove and remove subtitles that tagged for main speach such as defualt or main checking it with notepad or subtitle edit would be great help  
 3. start ripping 

@@ -1,5 +1,7 @@
 # ASSR-Anime-Sign-Song-Ripper-
 App designed to take ASS(SubStation Alpha) subtitle from anime subtitle and create subtitle for only sign and songs
+ASS(SubStation Alpha) subtitle have tags in most of the cases anime Signs and Songs have it own styles and main dialoge have it own, what this app does you select the text with certain syle to be removed that will do the trick, its not %100 acurate but its better than nothing. 
+
 
 if you are using ASS files so you don't need anything 
 

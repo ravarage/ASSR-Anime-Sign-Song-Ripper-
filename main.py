@@ -496,25 +496,12 @@ class frontdashclass(QtWidgets.QMainWindow):
         for i in mkvfiles:
             self.doit(i)
 
-    def timerother(self,i):
-        self.timer2.stop()
-        self.doit(i)
+
+
+
 
 
     def doit(self,i):
-        try:
-            self.extracing.is_alive()
-        except:
-            self.doitt(i)
-        else:
-            if self.extracing.is_alive():
-                self.timer2 = QtCore.QTimer()
-                self.timer2.timeout.connect(lambda :self.timerother(i))
-                self.timer2.start(1000)
-
-            else:
-                self.doitt(i)
-    def doitt(self,i):
         temp = str(gettempdir())
         file = temp + "\\" + "temp.bat"
         outfile = temp + "\\" + "temp.txt"
@@ -622,6 +609,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         for file in loadedfiles:
             if str(file).endswith("mkv"):
                 if file not in mkvfiles:
+                    print(file)
                     mkvfiles.append(str(file))
 
 
@@ -653,7 +641,7 @@ class frontdashclass(QtWidgets.QMainWindow):
 
                 file = self.directory + "/" + i
                 loadedfiles.append(file)
-        self.creatingdir()
+        #self.creatingdir()
 
 
         self.examingfiles()

@@ -18,8 +18,11 @@ as for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc loc
 mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder of mkv file with add text AS
 
 future plan:
+
 add Linux support
+
 Known bugs
+
 if ffprobe or mkvtoolnix did't found it will crash
 
 Icon taken from flaticons 

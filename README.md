@@ -24,5 +24,6 @@ add Linux support
 Known bugs
 
 if ffprobe or mkvtoolnix did't found it will crash
+no notification when extracting subtitle from mkv is done(wait and ckeck your temp folder and open temp txt subtitles or check task manager to see if mkvextrac is working)
 
 Icon taken from flaticons 

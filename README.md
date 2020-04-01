@@ -3,7 +3,7 @@ App designed to take ASS(SubStation Alpha) subtitle from anime subtitle and crea
 ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs and Songs have it own styles and main dialoge have it own, what this app does you select the tag that you want to remove which is main dialoge and the text with certain tag you selected  to be removed that will do the trick, its not %100 acurate but its better than nothing. 
 
 
-Ass Files Procedure:- 
+**Ass Files Procedure:- **
 
 1.just open the app load ASS subtitle 
 

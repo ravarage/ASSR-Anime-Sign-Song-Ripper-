@@ -26,7 +26,9 @@ Version 1.0.1
 
 Version 1.0.0
 - Initial release
-future plan:
+
+
+ToDO List:
 
 -add Linux support
 - polish look

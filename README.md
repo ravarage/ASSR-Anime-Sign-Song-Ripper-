@@ -5,11 +5,11 @@ ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs an
 
 Ass Files Procedure:- 
 
-1. just open the app load ASS subtitle 
+1.just open the app load ASS subtitle 
 
-2. open tag to remove and remove subtitles that tagged for main speach such as defualt or main checking it with notepad or subtitle edit would be great help  
+2.open tag to remove and remove subtitles that tagged for main speach such as defualt or main checking it with notepad or subtitle edit would be great help  
 
-3. start ripping 
+3.start ripping 
 
 4.output file would be inside subtitle folder you just opened 
 

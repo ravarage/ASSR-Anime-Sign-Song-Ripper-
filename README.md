@@ -37,6 +37,7 @@ ToDO List:
 - more settings
 
 
-
+Known Bugs
+- space in folder names cause error you wont get output
 
 ***Icon taken from flaticons ***

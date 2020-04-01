@@ -17,13 +17,21 @@ if you are using ASS files so you don't need anything
 as for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go
 mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder of mkv file with add text AS
 
+Version 1.0.1
+- more Accurate reconzing tags, better reconziztion of what to keep and remove
+- mkv extract now shell will be visible so do add tag to remove till mkvextract shell is done(usually takes few seconds)
+- output will be in folder output next to input file
+- it will show you if mkvtoolnix and ffprobe is missing
+Version 1.0.0
+- Initial release
 future plan:
 
-add Linux support
+-add Linux support
+- polish look
+- instead of shell progress happen in progress bar or status tips
+- more settings
 
-Known bugs
 
-if ffprobe or mkvtoolnix did't found it will crash
-no notification when extracting subtitle from mkv is done(wait and ckeck your temp folder and open temp txt subtitles or check task manager to see if mkvextrac is working)
+
 
 Icon taken from flaticons 

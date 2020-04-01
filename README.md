@@ -13,10 +13,10 @@ ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs an
 
 4.output file would be inside subtitle folder you just opened 
 
-As for MKV files
 
 
--as for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder create folder name out inside there will be output files
+
+> *As for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder create folder name out inside there will be output files*
 
 Version 1.0.1
 - more Accurate reconzing tags, better reconziztion of what to keep and remove

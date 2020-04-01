@@ -353,7 +353,15 @@ class frontdashclass(QtWidgets.QMainWindow):
 
                 with open(str(file), mode='r', encoding="utf-8") as data:
                     for lines in data:
-                        if any(x in lines for x in tagtoremove):
+                        liness = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",lines)
+                        try:
+                            linetag = liness.group(1)
+                        except:
+                            linetag = "Not dialoge"
+                        else:
+                            linetag = liness.group(1)
+                        if any(x == linetag for x in tagtoremove):
+                            print(lines)
                             pass
                         else:
                             with open(str(newnewfile), mode='a', encoding="utf-8") as newdata:
@@ -362,8 +370,14 @@ class frontdashclass(QtWidgets.QMainWindow):
                 mkvfilename = str(mkvfile)[int(str(mkvfile).rfind("/") + 1):]
                 index = str(mkvfile).rfind(mkvfilename)
                 folder = str(mkvfile[:index])
+                outdir= '"' + folder + '/out"'
                 print(index,folder,mkvfilename[:-4])
-                mkvnew = '"' + folder + mkvfilename + 'AS.mkv"'
+
+                try:
+                    os.mkdir(outdir)
+                except:
+                    pass
+                mkvnew = '"' + outdir + "/"+mkvfilename + '"'
                 oldmkv = '"'+mkvfile +'"'
                 newsub = '"' + newnewfile + '"'
 
@@ -444,7 +458,8 @@ class frontdashclass(QtWidgets.QMainWindow):
 
     def extractingthread(self,forextract2):
         try:
-            p = subprocess.run(forextract2, shell=True)
+            p = subprocess.Popen(forextract2, shell=True)
+            p.communicate()
         except:pass
         else: pass
 
@@ -554,9 +569,19 @@ class frontdashclass(QtWidgets.QMainWindow):
         mkvfilesload.append(newfiles)
         self.ui.treeWidget.clear()
 
-        for assfile in assfiles:
-            startpoint = str(assfile).rfind("/")
+        for assfilee in assfiles:
 
+            if str(mkvmergingdict.get(assfilee)) == None:
+                assfile = assfilee
+            else:
+                assfile = str(mkvmergingdict.get(assfilee))
+
+
+            startpoint = str(assfile).rfind("/")
+            if startpoint == 0:
+                startpoint = str(assfile).rfind("\\")
+            if startpoint == 0:
+                startpoint = str(assfile).rfind(r"\\")
             if startpoint == 0:
                 self.ui.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([assfile, assfile]))
             else:
@@ -636,11 +661,17 @@ class frontdashclass(QtWidgets.QMainWindow):
         tagtoremove.clear()
         self.directory = QtWidgets.QFileDialog.getExistingDirectory(self, 'Open Directory')
         print(self.directory)
-        for i in os.listdir(self.directory):
-            if i.endswith("ass") or i.endswith("mkv"):
+        if int(self.finder() == 1):
+            for i in os.listdir(self.directory):
+                if i.endswith("ass") or i.endswith("mkv"):
+                    file = self.directory + "/" + i
+                    loadedfiles.append(file)
+        else:
+            for i in os.listdir(self.directory):
+                if i.endswith("ass"):
+                    file = self.directory + "/" + i
+                    loadedfiles.append(file)
 
-                file = self.directory + "/" + i
-                loadedfiles.append(file)
         #self.creatingdir()
 
 
@@ -653,8 +684,15 @@ class frontdashclass(QtWidgets.QMainWindow):
         tagtokeep.clear()
         tagtoremove.clear()
         options = QtWidgets.QFileDialog.Options()
-        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
-                                                "Supported files Files (*.mkv *.ass);;Ass Subtitles (*.ass);;Matroska Files (*.mkv);;All Files (*)", options=options)
+        if int(self.finder() == 1):
+            files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+                                                              "Supported files Files (*.mkv *.ass);;Ass Subtitles (*.ass);;Matroska Files (*.mkv);;All Files (*)",
+                                                              options=options)
+        else:
+            files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+                                                              "Ass Subtitles (*.ass);;All Files (*)",
+                                                              options=options)
+
         if files:
             for file in files:
                 if file not in loadedfiles:
@@ -672,6 +710,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setWindowIcon(QtGui.QIcon('ico.png'))
         self.showMaximized()
+
         dummydata = QtWidgets.QTreeWidgetItem(["Dummy","Dummy"])
         self.ui.treeWidget.addTopLevelItem(dummydata)
         self.ui.treeWidget.setHeaderHidden(True)
@@ -687,7 +726,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.pushButton_2.clicked.connect(self.loadfolder)
         self.mkvinfo = str(config['MKVToolNix location']['dir']) + r"\mkvinfo"
         self.mkvextract = str(config['MKVToolNix location']['dir']) + r"\mkvextract"
-        print(self.mkvinfo)
+
 
         self.ui.pushButton_6.clicked.connect(self.tagtokeeploader)
         self.ui.pushButton_7.clicked.connect(self.tagtoremoveloader)
@@ -697,7 +736,83 @@ class frontdashclass(QtWidgets.QMainWindow):
 
 
 
+
         self.ui.pushButton_6.hide()
+        mkvextract = str(config['MKVToolNix location']['dir'])
+        ffprobe = str(config['ffprobe location']['dir'])
+        try:
+            oss = os.listdir(mkvextract)
+        except:
+
+            QtWidgets.QMessageBox.about(self, "error", "Mkvtoolnix not found please specify location in setting")
+
+        else:
+
+            if "mkvextract.exe" in oss:
+
+                pass
+            else:
+                QtWidgets.QMessageBox.about(self, "error",
+                                            "mkvextract not found please make sure all mkvtoonix tools are in on folder")
+
+            if "mkvmerge.exe" in oss:
+                try:
+                    ossp = os.listdir(ffprobe)
+                except:
+                    QtWidgets.QMessageBox.about(self, "error",
+                                                "mkvmerge not found please specify location in setting")
+
+
+                else:
+                    if "ffprobe.exe" in ossp:
+
+                        pass
+                    else:
+                        QtWidgets.QMessageBox.about(self, "error",
+                                                    "ffprobe not found please make sure its names ffprobe.exe and specify it location in setting")
+
+
+            else:
+                QtWidgets.QMessageBox.about(self, "error",
+                                            "mkvmerge not found please make sure all mkvtoonix tools are in on folder")
+
+
+
+    def finder(self):
+        mkvextract = str(config['MKVToolNix location']['dir'])
+        ffprobe = str(config['ffprobe location']['dir'])
+        try:
+            oss = os.listdir(mkvextract)
+        except:
+
+
+            return 0
+        else:
+
+            if "mkvextract.exe" in oss:
+
+                pass
+            else:
+
+                return 0
+            if "mkvmerge.exe" in oss:
+                try:
+                    ossp = os.listdir(ffprobe)
+                except:
+
+                    return 0
+
+                else:
+                    if "ffprobe.exe" in ossp:
+                        return 1
+
+                    else:
+                        return 0
+
+            else:
+                return 0
+
+
 
 
 def handler(msg_type, msg_log_context, msg_string):
@@ -723,8 +838,10 @@ if __name__ == "__main__":
     print(config['MKVToolNix location']['dir'])
     with open('asscconfig.ini', 'w') as fout:
         config.write(fout)
+
     app = QtWidgets.QApplication(sys.argv)
     application = frontdashclass()
     application.show()
+
     sys.exit(app.exec_())
 

@@ -20,7 +20,7 @@ ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs an
 
 Version 1.0.1
 - more Accurate recognizing tags, better recognition of what to keep and remove
-- mkv extract now shell will be visible so do add a tag to remove till mkvextract shell is done(usually takes few seconds)
+- mkv extract now shell will be visible so do not add a tag to remove till mkvextract shell is done(usually takes few seconds)
 - the output will be in folder output next to the input file
 - it will show you if mkvtoolnix and ffprobe is missing
 

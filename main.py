@@ -443,7 +443,7 @@ class frontdashclass(QtWidgets.QMainWindow):
             data =  open(str(i),mode='r',encoding="utf-8")
             readdata = data.readlines()
             for line in readdata:
-                regex = re.search(r"^Style: (.*?)\,", str(line))
+                regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",line)
                 try:
                     tag = str(regex.group(1))
                 except:
@@ -452,14 +452,55 @@ class frontdashclass(QtWidgets.QMainWindow):
                     if  tag not in tagfound:
                         if tag not in tagtoremove:
                             tagfound.append(tag)
+        tagfound.sort()
 
 
+    def timerwin(self):
+        self.progressBar = QtWidgets.QProgressBar(self)
+        self.progressBar.setGeometry(130, 140, 500, 125)
+        self.progressBar.show()
 
+
+        self.progressBar.setFormat("")
+
+    def oh_no(self):
+        worker = self.timerwin()
+        self.threadpool.start(worker)
 
     def extractingthread(self,forextract2):
+       # si = subprocess.STARTUPINFO()
+       # si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+      #  CREATE_NO_WINDOW = 0x08000000
+      #  self.threadpool = QtCore.QThreadPool()
+       # print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+      #  self.oh_no()
+
+        # self.timerwin()
         try:
-            p = subprocess.Popen(forextract2, shell=True)
-            p.communicate()
+            p = subprocess.run(forextract2,stdout=subprocess.PIPE, creationflags=CREATE_NO_WINDOW)
+            while True:
+                text = ""
+                for line in p.stdout.decode("UTF-8"):
+                    text = text + line
+
+                    if "Progress" in text and r"%" in text:
+                       # self.setStatusTip(str(text))
+                        regex = re.search(r"Progress:(.*)%",text)
+                        try:
+                            pass
+                        #    self.progressBar.setValue(int(regex.group(1)))
+                        except:pass
+
+
+
+
+                        text = ""
+                else:
+                    break
+                if not line:
+                    break
+
+
         except:pass
         else: pass
 
@@ -532,7 +573,8 @@ class frontdashclass(QtWidgets.QMainWindow):
         with open(outfile) as ms:
             for ssa in ms:
                 if "ass" in ssa.strip().lower():
-                    self.found.append(ssa.strip())
+                    if ssa not in self.found:
+                        self.found.append(ssa.strip())
         if len(self.found) == 0:
             QtWidgets.QMessageBox.about(self, "Error", "No Subtitle found")
         if len(self.found) > 1:
@@ -565,8 +607,10 @@ class frontdashclass(QtWidgets.QMainWindow):
         tempdict = {newfiles: i}
         mkvmergingdict.update(tempdict)
         print(newfiles)
-        assfiles.append(newfiles)
-        mkvfilesload.append(newfiles)
+        if newfiles not in assfiles:
+            assfiles.append(newfiles)
+        if newfiles not in mkvfilesload:
+            mkvfilesload.append(newfiles)
         self.ui.treeWidget.clear()
 
         for assfilee in assfiles:
@@ -697,6 +741,7 @@ class frontdashclass(QtWidgets.QMainWindow):
             for file in files:
                 if file not in loadedfiles:
                     loadedfiles.append(file)
+            self.ui.treeWidget.clear()
 
             self.creatingdir()
 
@@ -719,6 +764,7 @@ class frontdashclass(QtWidgets.QMainWindow):
 
         filename.setStyleSheet(cssbutton)
         filename.setText("Files")
+
         filename.setFont(QtGui.QFont("a",15))
         self.ui.treeWidget.setFont(QtGui.QFont("a",15))
         self.ui.treeWidget.setItemWidget(dummydata, 1, filename)
@@ -733,6 +779,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.pushButton_3.clicked.connect(self.removeselectedfile)
         self.ui.pushButton_5.clicked.connect(self.rippingdata)
         self.ui.pushButton_4.clicked.connect(self.settingloader)
+        self.setStatusTip("Ready")
 
 
 

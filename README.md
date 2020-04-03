@@ -18,6 +18,10 @@ ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs an
 
 > *As for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder create folder name out inside there will be output files*
 
+Version 1.0.2
+- Impoved Accuracy recognizing tags, better recognition of what to keep and remove
+- Minor bug fixes 
+
 Version 1.0.1
 - more Accurate recognizing tags, better recognition of what to keep and remove
 - mkv extract now shell will be visible so do not add a tag to remove till mkvextract shell is done(usually takes few seconds)
@@ -38,6 +42,7 @@ ToDO List:
 
 
 Known Bugs
-- space in folder names cause error you wont get output
+- please be aware of Maximum Path Length Limitation of windows
+
 
 ***Icon taken from flaticons ***

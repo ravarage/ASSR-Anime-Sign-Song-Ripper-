@@ -19,7 +19,9 @@ mkvmergingdict = {}
 tagtoremove = []
 tagfound = []
 mkvfilesload = []
-
+from textbrowser import Ui_MainWindow as textbrowserloader
+import traceback
+from PyQt5.QtCore import pyqtSignal
 #Stream #0:(\d*?):(.*)\n.*Metadata:|Stream #0:(.*?)\(.*\):(.*)\n.*Metadata:
 
 cssbutton = "QPushButton {\n"
@@ -118,7 +120,208 @@ cssbutton = "QPushButton {\n"
 "h1 {\n"
 "    font: 150%/150% \'Freckle Face\', cursive;\n"
 "}"
+
+
+class WorkerSignals(QtCore.QObject):
+    '''
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+
+    error
+        `tuple` (exctype, value, traceback.format_exc() )
+
+    result
+        `object` data returned from processing, anything
+
+    progress
+        `int` indicating % progress
+
+    '''
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
+class runable2(QtCore.QRunnable):
+    def __init__(self, *args, **kwargs):
+        super(runable2, self).__init__()
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+    def anotherthread(self):
+
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        CREATE_NO_WINDOW = 0x08000000
+        try:
+            p = subprocess.run(self.args[0],shell=False,creationflags = CREATE_NO_WINDOW, startupinfo=startupinfo ,stdout=subprocess.PIPE)
+            while True:
+                text = ""
+
+                for line in p.stdout.decode("UTF-8"):
+
+                    text = text + line
+
+
+                    if "Progress" in text and r"%" in text:
+                        # self.setStatusTip(str(text))
+                        regex = re.search(r"Progress:(.*)%", text)
+                        try:
+                            pass
+                            self.signals.result.emit(regex.group(1))
+                        except:
+                            pass
+
+                        text = ""
+                else:
+                    break
+                if not line:
+                    break
+
+
+        except:
+            pass
+        else:
+            pass
+        finally:
+            self.signals.finished.emit()
+
+    def run(self):
+        a  = threading.Thread(target=self.anotherthread)
+        a.start()
+
+
+
+
+class runable(QtCore.QRunnable):
+    def __init__(self, *args, **kwargs):
+        super(runable, self).__init__()
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+    def anotherthread(self):
+
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        CREATE_NO_WINDOW = 0x08000000
+        try:
+            p = subprocess.run(self.args[0],shell=False,creationflags = CREATE_NO_WINDOW, startupinfo=startupinfo ,stdout=subprocess.PIPE)
+            while True:
+                text = ""
+                for line in p.stdout.decode("UTF-8"):
+                    text = text + line
+
+                    if "Progress" in text and r"%" in text:
+                        # self.setStatusTip(str(text))
+                        regex = re.search(r"Progress:(.*)%", text)
+                        try:
+                            pass
+                            self.signals.result.emit(regex.group(1))
+                        except:
+                            pass
+
+                        text = ""
+                else:
+                    break
+                if not line:
+                    break
+
+
+        except:
+            pass
+        else:
+            pass
+        finally:
+            self.signals.finished.emit()
+
+    def run(self):
+        a  = threading.Thread(target=self.anotherthread)
+        a.start()
+
+
+
+class loadingwin(QtWidgets.QProgressBar):
+    def __init__(self):
+        super(loadingwin, self).__init__()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setGeometry(130, 140, 500, 125)
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        qtRectangle = self.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+        qtRectangle.moveCenter(centerPoint)
+        self.move(qtRectangle.topLeft())
+
+
+
+class textbrowserclass(QtWidgets.QMainWindow):
+    tagfounds = []
+    def tagreader(self,file):
+        readlines = ""
+        indexes = self.ui.treeWidget.selectionModel().selectedIndexes()
+
+        try:
+            ase = indexes[0].row()
+        except:
+            pass
+
+        else:
+            mes = self.ui.treeWidget.model().index(ase, 0)
+            first_cell_selected = self.ui.treeWidget.model().data(mes, QtCore.Qt.DisplayRole)
+            data = open(str(file), mode='r', encoding="utf-8")
+            readdata = data.readlines()
+            for line in readdata:
+                regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
+                try:
+                    tag = str(regex.group(1))
+                except:
+                    pass
+                else:
+                    if tag == first_cell_selected:
+                        readline = re.search(r"^Dialogue:\s\d+,(\d+:\d+:\d+\.\d+),(\d+:\d+:\d+\.\d+),.*?,,.*?,.*?,.*?,,(.*)",line)
+                        try:
+                            start = readline.group(1)
+                            end = readline.group(2)
+                            text = readline.group(3)
+                        except:
+                            pass
+                        else:
+                            fullline = str(start) + ", " + str(end) + ", " + text + "\n"
+                            readlines = readlines + fullline
+        self.ui.textBrowser.setText(readlines)
+
+
+    def tagfinder(self,file):
+        data = open(str(file), mode='r', encoding="utf-8")
+        readdata = data.readlines()
+        for line in readdata:
+            regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
+            try:
+                tag = str(regex.group(1))
+            except:
+                pass
+            else:
+                if tag not in self.tagfounds:
+                    self.tagfounds.append(tag)
+                    item = QtWidgets.QTreeWidgetItem([tag,tag])
+                    self.ui.treeWidget.addTopLevelItem(item)
+
+    tagfound.sort()
+    def __init__(self,file):
+        super(textbrowserclass, self).__init__()
+        self.ui = textbrowserloader()
+        self.ui.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon('ico.png'))
+        self.ui.treeWidget.setHeaderHidden(True)
+        self.ui.treeWidget.hideColumn(0)
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.tagfinder(file)
+        self.ui.treeWidget.doubleClicked.connect(lambda :self.tagreader(file))
+
 class settingclass(QtWidgets.QMainWindow):
+
     def savesetting(self):
         config['MKVToolNix location'] = {'dir': str(self.ui.lineEdit.text())}
         config['ffprobe location'] = {'dir': str(self.ui.lineEdit_2.text())}
@@ -320,6 +523,13 @@ class frontdashclass(QtWidgets.QMainWindow):
 
         if len(self.done) == len(assfiles):
             QtWidgets.QMessageBox.about(self, "Done", "All operations are  completed")
+            self.ui.treeWidget.clear()
+            assfiles.clear()
+            tagfound.clear()
+            tagtoremove.clear()
+            mkvmergingdict.clear()
+            mkvfilesload.clear()
+            mkvfiles.clear()
             self.done.clear()
             self.timer.stop()
         else:
@@ -330,21 +540,22 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.done.append(mkvstring)
     u = 0
     def rippingthread(self):
+        self.uu = 0
         QtWidgets.QMessageBox.about(self, "started", "All operations started wait till you get done signal")
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.checker)
         self.timer.start(1000)
+        self.loadingwindows=loadingwin()
+        self.loadingwindows.hide()
+
 
 
         for file in assfiles:
             if file in mkvfilesload:
-                print("Got hre")
+                self.loadingwindows.show()
                 temp = gettempdir()
-
                 newnewfile = temp + "\\" + str(self.u) + ".ass"
                 self.u =+ 1
-                print(newnewfile)
-
                 createdfiles.append(newnewfile)
                 try:
                     os.remove(newnewfile)
@@ -361,7 +572,7 @@ class frontdashclass(QtWidgets.QMainWindow):
                         else:
                             linetag = liness.group(1)
                         if any(x == linetag for x in tagtoremove):
-                            print(lines)
+
                             pass
                         else:
                             with open(str(newnewfile), mode='a', encoding="utf-8") as newdata:
@@ -371,7 +582,11 @@ class frontdashclass(QtWidgets.QMainWindow):
                 index = str(mkvfile).rfind(mkvfilename)
                 folder = str(mkvfile[:index])
                 outdir= '"' + folder + '/out"'
-                print(index,folder,mkvfilename[:-4])
+                if len(outdir) > 254:
+                    outdir = '"'+ folder[0] + ":/ASSR" +'"'
+                    QtWidgets.QMessageBox.about(self,"Warning","output folder exceed windows path limit \nOutput files will be in {}".format(outdir))
+
+
 
                 try:
                     os.mkdir(outdir)
@@ -385,18 +600,19 @@ class frontdashclass(QtWidgets.QMainWindow):
 
                 self.mkvmerge = str(config['MKVToolNix location']['dir']) + r"\mkvmerge"
 
-                mkvstring = "{} -o {} {}  --track-name 0:ASSR {}  --default-language eng".format(self.mkvmerge,mkvnew, oldmkv, newsub)
-                thread = threading.Thread(target=(lambda :self.mergingthread(mkvstring)))
-                thread.start()
+                mkvstring = "{} -o {} {} --default-track 0 --track-name 0:ASSR {}  --default-language eng".format(self.mkvmerge,mkvnew, oldmkv, newsub)
+                self.tgread = QtCore.QThreadPool()
+                worker = runable2(mkvstring)
+                worker.signals.result.connect(self.print_output)
+                worker.signals.finished.connect(self.thread_complete2)
+                self.tgread.start(worker)
 
-
-                "mkvmerge -o output.mkv input.mkv subs.srt"
 
             else:
                 filename = str(file)[int(str(file).rfind("/") + 1):]
                 index = str(file).rfind(filename)
                 folder = str(file[:index])
-                print("Wront folder")
+
 
                 outputfolder = folder+ "ASSR Files"
                 try:
@@ -439,7 +655,7 @@ class frontdashclass(QtWidgets.QMainWindow):
     def readingtagsfromass(self):
 
         for i in assfiles:
-            print(i)
+
             data =  open(str(i),mode='r',encoding="utf-8")
             readdata = data.readlines()
             for line in readdata:
@@ -454,55 +670,6 @@ class frontdashclass(QtWidgets.QMainWindow):
                             tagfound.append(tag)
         tagfound.sort()
 
-
-    def timerwin(self):
-        self.progressBar = QtWidgets.QProgressBar(self)
-        self.progressBar.setGeometry(130, 140, 500, 125)
-        self.progressBar.show()
-
-
-        self.progressBar.setFormat("")
-
-    def oh_no(self):
-        worker = self.timerwin()
-        self.threadpool.start(worker)
-
-    def extractingthread(self,forextract2):
-       # si = subprocess.STARTUPINFO()
-       # si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-      #  CREATE_NO_WINDOW = 0x08000000
-      #  self.threadpool = QtCore.QThreadPool()
-       # print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-      #  self.oh_no()
-
-        # self.timerwin()
-        try:
-            p = subprocess.run(forextract2,stdout=subprocess.PIPE, creationflags=CREATE_NO_WINDOW)
-            while True:
-                text = ""
-                for line in p.stdout.decode("UTF-8"):
-                    text = text + line
-
-                    if "Progress" in text and r"%" in text:
-                       # self.setStatusTip(str(text))
-                        regex = re.search(r"Progress:(.*)%",text)
-                        try:
-                            pass
-                        #    self.progressBar.setValue(int(regex.group(1)))
-                        except:pass
-
-
-
-
-                        text = ""
-                else:
-                    break
-                if not line:
-                    break
-
-
-        except:pass
-        else: pass
 
     def selectorwindow(self,text,numbers):
         self.windows = QtWidgets.QMainWindow()
@@ -536,8 +703,26 @@ class frontdashclass(QtWidgets.QMainWindow):
             self.found.append(first_cell_selected)
             self.windows.close()
             self.doingsomething(i, gettempdir())
+    def textbrowserwin(self):
+        indexes = self.ui.treeWidget.selectionModel().selectedIndexes()
+
+        try:
+            ase = indexes[0].row()
+        except:
+            pass
+
+        else:
+            mes = self.ui.treeWidget.model().index(ase, 0)
+            first_cell_selected = self.ui.treeWidget.model().data(mes, QtCore.Qt.DisplayRole)
+            self.textloader = textbrowserclass(first_cell_selected)
+            self.textloader.show()
+
+
 
     def extraingassfrommkv(self):
+        self.uu = 0
+        self.loadingwindows=loadingwin()
+        self.loadingwindows.hide()
 
 
 
@@ -566,8 +751,12 @@ class frontdashclass(QtWidgets.QMainWindow):
         with open(file, "w")as me:
             me.write(extractingstring)
             me.close()
-        p = subprocess.Popen([file], stderr=subprocess.PIPE)
-        p.communicate()
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        CREATE_NO_WINDOW = 0x08000000
+
+        subprocess.run([file], stderr=subprocess.PIPE,shell=False, creationflags=CREATE_NO_WINDOW, startupinfo=startupinfo)
+       # p.communicate()
         self.found = []
         self.found.clear()
         with open(outfile) as ms:
@@ -584,8 +773,30 @@ class frontdashclass(QtWidgets.QMainWindow):
         else:
 
             self.doingsomething(i, temp)
+    def print_output(self,a):
+        try:
+            e = len(mkvfiles) * 100
+            b = self.uu * 100
+            c = b + int(a)
+            g = c /e
+            k = g * 100
+            k = int(k)
+            self.loadingwindows.setValue(int(k))
+        except:pass
+    def thread_complete2(self):
 
+        self.uu += 1
+        if len(mkvfiles) == self.uu:
+            self.loadingwindows.close()
+            QtWidgets.QMessageBox.about(self,"Done","All merging mkv file done successfully")
+    def thread_complete(self):
+
+        self.uu += 1
+        if len(mkvfiles) == self.uu:
+            self.loadingwindows.close()
+            QtWidgets.QMessageBox.about(self,"Done","All subtitle read successfully")
     def doingsomething(self,i,temp):
+        self.loadingwindows.show()
 
         try:
             stream = self.found[0]
@@ -599,14 +810,20 @@ class frontdashclass(QtWidgets.QMainWindow):
         newfiles = temp + "\\" +  filename + ".txt"
 
         forextract2 = '"' + self.mkvextract + '" '+'"' + i +'"'+ " tracks " + str(streamid) + ":" + newfile
-        print(forextract2,"gg")
 
-        self.extracing = threading.Thread(target=lambda: self.extractingthread(forextract2))
-        self.extracing.start()
+
+        self.tgread = QtCore.QThreadPool()
+        worker = runable(forextract2)
+        worker.signals.result.connect(self.print_output)
+        worker.signals.finished.connect(self.thread_complete)
+        self.tgread.start(worker)
+
+       # self.extracing = threading.Thread(target=lambda: self.extractingthread(forextract2))
+        #self.extracing.start()
 
         tempdict = {newfiles: i}
         mkvmergingdict.update(tempdict)
-        print(newfiles)
+
         if newfiles not in assfiles:
             assfiles.append(newfiles)
         if newfiles not in mkvfilesload:
@@ -630,7 +847,7 @@ class frontdashclass(QtWidgets.QMainWindow):
                 self.ui.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([assfile, assfile]))
             else:
                 filenow = str(assfile)[startpoint + 1:]
-                self.ui.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([assfile, filenow]))
+                self.ui.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([assfilee, filenow]))
 
 
 
@@ -678,7 +895,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         for file in loadedfiles:
             if str(file).endswith("mkv"):
                 if file not in mkvfiles:
-                    print(file)
+
                     mkvfiles.append(str(file))
 
 
@@ -704,24 +921,32 @@ class frontdashclass(QtWidgets.QMainWindow):
         tagtokeep.clear()
         tagtoremove.clear()
         self.directory = QtWidgets.QFileDialog.getExistingDirectory(self, 'Open Directory')
-        print(self.directory)
-        if int(self.finder() == 1):
-            for i in os.listdir(self.directory):
-                if i.endswith("ass") or i.endswith("mkv"):
-                    file = self.directory + "/" + i
-                    loadedfiles.append(file)
+
+        try:
+            os.listdir(self.directory)
+        except:pass
         else:
-            for i in os.listdir(self.directory):
-                if i.endswith("ass"):
-                    file = self.directory + "/" + i
-                    loadedfiles.append(file)
+            if int(self.finder() == 1):
+                for i in os.listdir(self.directory):
+                    if i.endswith("ass") or i.endswith("mkv"):
+                        file = self.directory + "/" + i
+                        loadedfiles.append(file)
+            else:
+                for i in os.listdir(self.directory):
+                    if i.endswith("ass"):
+                        file = self.directory + "/" + i
+                        loadedfiles.append(file)
+            self.examingfiles()
+
+            self.extraingassfrommkv()
+
+
+
 
         #self.creatingdir()
 
 
-        self.examingfiles()
 
-        self.extraingassfrommkv()
 
     def loadfiles(self):
         tagfound.clear()
@@ -761,7 +986,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.treeWidget.setHeaderHidden(True)
         self.ui.treeWidget.hideColumn(0)
         filename = QtWidgets.QPushButton(self.ui.centralwidget)
-
+        self.ui.treeWidget.doubleClicked.connect(self.textbrowserwin)
         filename.setStyleSheet(cssbutton)
         filename.setText("Files")
 
@@ -780,6 +1005,8 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.pushButton_5.clicked.connect(self.rippingdata)
         self.ui.pushButton_4.clicked.connect(self.settingloader)
         self.setStatusTip("Ready")
+
+      #  self.load.changevalue(45)
 
 
 
@@ -863,7 +1090,8 @@ class frontdashclass(QtWidgets.QMainWindow):
 
 
 def handler(msg_type, msg_log_context, msg_string):
-    print(msg_type, msg_log_context, msg_string)
+    pass
+    #print(msg_type, msg_log_context, msg_string)
 QtCore.qInstallMessageHandler(handler)
 if __name__ == "__main__":
     config = configparser.ConfigParser()
@@ -872,17 +1100,16 @@ if __name__ == "__main__":
         os.mkdir(settinglocation)
     except:pass
     asscconfig = settinglocation + "asscconfig.ini"
-    print(asscconfig)
+
     config.read(asscconfig)
     if "asscconfig.ini" not in os.listdir(settinglocation):
-        print("stanwa")
+
         config['MKVToolNix location'] = {'dir':"C:\Program Files\MKVToolNix"}
 
         with open(asscconfig, 'w') as configfile:
             config.write(configfile)
 
 
-    print(config['MKVToolNix location']['dir'])
     with open('asscconfig.ini', 'w') as fout:
         config.write(fout)
 

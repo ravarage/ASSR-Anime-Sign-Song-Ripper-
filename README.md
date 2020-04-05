@@ -41,7 +41,6 @@ ToDO List:
 
 - add Linux support
 - polish look
-- instead of shell progress happen in progress bar or status tips
 - more settings
 
 

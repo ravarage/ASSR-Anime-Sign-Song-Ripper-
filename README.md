@@ -17,6 +17,9 @@ ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs an
 
 
 > *As for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder create folder name out inside there will be output files*
+Version 1.0.3
+ - Now we have proper progress bar no more console shell
+ - Tag Explore, you can double click on a file it will open a window so you can read what lines written using that tag(experimental)
 
 Version 1.0.2
 - Improved Accuracy recognizing tags, better recognition of what to keep and remove
@@ -42,7 +45,10 @@ ToDO List:
 
 
 Known Bugs
-- please be aware of Maximum Path Length Limitation of windows
+- please be aware of Maximum Path Length Limitation of windows(Still issue on 1.0.3)
+
+Suggestion
+ - Sometimes depending on anime and subtitle that you have, you have to do episode by episode, to get more accurate reading,rare but it happen
 
 
 ***Icon taken from flaticons ***

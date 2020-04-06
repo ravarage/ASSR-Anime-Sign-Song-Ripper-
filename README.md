@@ -31,7 +31,7 @@
 </ul>
 <h2>Known Bugs</h2>
 <ul>
-    <li>Windows path limitation, if you exceed it you wont get your output files</li>
+    <li>Not That I know of</li>
 </ul>
 <h2>ToDO</h2>
 <ul>
@@ -40,7 +40,11 @@
     <li>More User Settings</li>
 </ul>
 <h2>ChangeLogs</h2>
-
+<h4>Version 1.0.4</h4>
+<ul>
+    <li>Windows path limitation had been fixed</li>
+    <li>improvement of tag recognition</li>
+</ul>
 <h4>Version 1.0.3</h4>
 <ul>
     <li>Now we have proper progress bar no more console shell.</li>

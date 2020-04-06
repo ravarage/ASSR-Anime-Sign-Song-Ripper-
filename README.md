@@ -1,57 +1,66 @@
-# ASSR-Anime-Sign-Song-Ripper-
-App designed to take ASS(SubStation Alpha) subtitle from anime subtitle and create subtitle for only sign and songs
-ASS(SubStation Alpha) subtitle have tags in it, most of the cases anime Signs and Songs have it own styles and main dialoge have it own, what this app does you select the tag that you want to remove which is main dialoge and the text with certain tag you selected  to be removed that will do the trick, its not %100 acurate but its better than nothing. 
+<h1>ASSR(Anime Sign&Songs Subtitle Creater)</h1><br>
+<label class="center" >Software design to Create Sign&Songs subtitle from ASS(SubStation Alpha) for Anime from Main Subtitle</label>
+<p align="middle"><img  src="https://i.postimg.cc/WpGRKMZ6/main-w-DTp-Lug-RFN.png" alt="ASSR" align="middle" height="450" width="800"></p>
+<h2>Program Feature</h2>
+<ul>
+    <li>It can create Sign&Song Subtitle from Main ASS(SubStation Alpha)</li>
+    <li>It can extract main subtitle from mkv files</li>
+    <li>It can merge new subtitle with mkv files</li>
+    <li>It can view lines with selected tags(experimental)</li>
+</ul>
+<h2>Usage</h2><img src="https://i.postimg.cc/cJLtfhbC/main-9-Hk-WNJNRav.png" alt="TvNaming" align="right" height="350" width="600"><br>
+<h3>For ASS(SubStation Alpha) Files</h3>
+<ol>
+    <li>Load the Ass Files</li>
+    <li>Double Click on files to view where the Tag have been used</li>
+    <li>Click Tag to remove to remove the lines with certain tags</li>
+    <li>Start Ripping</li>
+    <li>Get your new file in folder called out next to source file
+    <ul>
+        <li>Doing whole season depending on Anime(most of the time is fine) it can lead to false detection avoid it when anime have too much tags</li>
+    </ul></li>
+</ol>
+<code>for MKV files its some procedure except you need to have MKVToolnix and FFprobe on your computer so you can read, extract and merge the new subtitle </code>
+<h2>Coding details</h2>
+<ul>
+    <li>The Software Written in Python</li>
+    <li>Library Used PYQT5(GUI)</li>
+    <li>Free and Open Source</li>
+    <li>Windows Binary made Using Nutika with Mingw64</li>
+    <li>to Work with mkv files you need to have MKVToolnix and FFprobe</li>
+</ul>
+<h2>Known Bugs</h2>
+<ul>
+    <li>Windows path limitation, if you exceed it you wont get your output files</li>
+</ul>
+<h2>ToDO</h2>
+<ul>
+    <li>Add Linux Support</li>
+    <li>ReVamp UI</li>
+    <li>More User Settings</li>
+</ul>
+<h2>ChangeLogs</h2>
 
+<h4>Version 1.0.3</h4>
+<ul>
+    <li>Now we have proper progress bar no more console shell.</li>
+    <li>Tag Explore, you can double click on a file it will open a window so you can read what lines written using that tag(experimental)</li>
+</ul>
+<h4>Version 1.0.2</h4>
+<ul>
+    <li>Improved Accuracy recognizing tags, better recognition of what to keep and remove.</li>
+    <li>Minor bug fixes</li>
+</ul>
+<h4>Version 1.0.1</h4>
+<ul>
+    <li>more Accurate recognizing tags, better recognition of what to keep and remove.</li>
+    <li>mkv extract now shell will be visible so do not add a tag to remove till mkvextract shell is done(usually takes few seconds)</li>
+    <li>the output will be in folder output next to the input file</li>
+    <li>it will show you if mkvtoolnix and ffprobe is missing</li>
+</ul>
 
-**Ass Files Procedure:- **
-
-1. just open the app load ASS subtitle 
-
-2. open tag to remove and remove subtitles that tagged for main speach such as defualt or main checking it with notepad or subtitle edit would be great help  
-
-3. start ripping 
-
-4. output file would be inside subtitle folder you just opened 
-
-
-
-
-> *As for mkv files you need to have FFprobe and mkvtoolnix on your PC, from pc locate both of them and you are good to go mkv files procedure are the same as subtitles files the output will be mkvfile inside same folder create folder name out inside there will be output files*
-
-Version 1.0.3
- - Now we have proper progress bar no more console shell
- - Tag Explore, you can double click on a file it will open a window so you can read what lines written using that tag(experimental)
-
-Version 1.0.2
-- Improved Accuracy recognizing tags, better recognition of what to keep and remove
-- Minor bug fixes 
-
-Version 1.0.1
-- more Accurate recognizing tags, better recognition of what to keep and remove
-- mkv extract now shell will be visible so do not add a tag to remove till mkvextract shell is done(usually takes few seconds)
-- the output will be in folder output next to the input file
-- it will show you if mkvtoolnix and ffprobe is missing
-
-
-Version 1.0.0
-- Initial release
-
-
-ToDO List:
-
-- add Linux support
-- polish look
-- more settings
-
-
-Known Bugs
-- please be aware of Maximum Path Length Limitation of windows(Still issue on 1.0.3)
-
-Suggestion
- - Sometimes depending on anime and subtitle that you have, you have to do episode by episode, to get more accurate reading,rare but it happen
-
-Screen
-
-![main_9HkWNJNRav.png](https://i.postimg.cc/cJLtfhbC/main-9-Hk-WNJNRav.png)
-
-***Icon taken from flaticons ***
+<h4>Version 1.0.0</h4>
+<ul>
+    <li>Initial release</li>
+</ul>
+<label>***Icon taken from flaticons ***</label>

@@ -8,7 +8,7 @@
     <li>It can merge new subtitle with mkv files</li>
     <li>It can view lines with selected tags(experimental)</li>
 </ul>
-<h2>Usage</h2><img src="https://i.postimg.cc/cJLtfhbC/main-9-Hk-WNJNRav.png" alt="TvNaming" align="right" height="350" width="600"><br>
+<h2>Usage</h2><img src="https://i.postimg.cc/cJLtfhbC/main-9-Hk-WNJNRav.png" alt="TvNaming" align="right" height="150" width="300"><br>
 <h3>For ASS(SubStation Alpha) Files</h3>
 <ol>
     <li>Load the Ass Files</li>

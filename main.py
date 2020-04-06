@@ -275,16 +275,16 @@ class textbrowserclass(QtWidgets.QMainWindow):
             for line in readdata:
                 regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
                 try:
-                    tag = str(regex.group(1))
+                    tag = str(regex.group(1)).strip()
                 except:
                     pass
                 else:
                     if tag == first_cell_selected:
                         readline = re.search(r"^Dialogue:\s\d+,(\d+:\d+:\d+\.\d+),(\d+:\d+:\d+\.\d+),.*?,,.*?,.*?,.*?,,(.*)",line)
                         try:
-                            start = readline.group(1)
-                            end = readline.group(2)
-                            text = readline.group(3)
+                            start = readline.group(1).strip()
+                            end = readline.group(2).strip()
+                            text = readline.group(3).strip()
                         except:
                             pass
                         else:
@@ -299,7 +299,7 @@ class textbrowserclass(QtWidgets.QMainWindow):
         for line in readdata:
             regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
             try:
-                tag = str(regex.group(1))
+                tag = str(regex.group(1)).strip()
             except:
                 pass
             else:
@@ -566,11 +566,11 @@ class frontdashclass(QtWidgets.QMainWindow):
                     for lines in data:
                         liness = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",lines)
                         try:
-                            linetag = liness.group(1)
+                            linetag = liness.group(1).strip()
                         except:
                             linetag = "Not dialoge"
                         else:
-                            linetag = liness.group(1)
+                            linetag = liness.group(1).strip()
                         if any(x == linetag for x in tagtoremove):
 
                             pass
@@ -582,9 +582,14 @@ class frontdashclass(QtWidgets.QMainWindow):
                 index = str(mkvfile).rfind(mkvfilename)
                 folder = str(mkvfile[:index])
                 outdir= '"' + folder + '/out"'
-                if len(outdir) > 254:
+                mkvnew = '"' + folder+  "/"+"out"+ "/"+mkvfilename + '"'
+                oldmkv = '"'+mkvfile +'"'
+                newsub = '"' + newnewfile + '"'
+                print(mkvnew)
+                if len(mkvnew) > 254:
                     outdir = '"'+ folder[0] + ":/ASSR" +'"'
                     QtWidgets.QMessageBox.about(self,"Warning","output folder exceed windows path limit \nOutput files will be in {}".format(outdir))
+                    mkvnew = '"' + outdir + "/" + mkvfilename + '"'
 
 
 
@@ -592,9 +597,7 @@ class frontdashclass(QtWidgets.QMainWindow):
                     os.mkdir(outdir)
                 except:
                     pass
-                mkvnew = '"' + outdir + "/"+mkvfilename + '"'
-                oldmkv = '"'+mkvfile +'"'
-                newsub = '"' + newnewfile + '"'
+
 
 
 
@@ -661,7 +664,7 @@ class frontdashclass(QtWidgets.QMainWindow):
             for line in readdata:
                 regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",line)
                 try:
-                    tag = str(regex.group(1))
+                    tag = str(regex.group(1)).strip()
                 except:
                     pass
                 else:
@@ -917,6 +920,7 @@ class frontdashclass(QtWidgets.QMainWindow):
 
     #  directory = str(QtWidgets.QFileDialog.getExistingDirectory())
     def loadfolder(self):
+        QtWidgets.QMessageBox.about(self,"Warning","Doing folder depending on the anime,it can lead to false detection of the tags")
         tagfound.clear()
         tagtokeep.clear()
         tagtoremove.clear()
@@ -1094,6 +1098,7 @@ def handler(msg_type, msg_log_context, msg_string):
     #print(msg_type, msg_log_context, msg_string)
 QtCore.qInstallMessageHandler(handler)
 if __name__ == "__main__":
+  
     config = configparser.ConfigParser()
     settinglocation = str(os.path.expanduser("~\\")) + str(r"ASSR Setting\\")
     try:

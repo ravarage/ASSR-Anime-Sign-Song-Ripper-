@@ -24,7 +24,7 @@
 <h2>Coding details</h2>
 <ul>
     <li>The Software Written in Python</li>
-    <li>Library Used PYQT5(GUI)</li>
+    <li>Library Used PYQT5(GUI) and PySub2</li>
     <li>Free and Open Source</li>
     <li>Windows Binary made Using Nutika with Mingw64</li>
     <li>to Work with mkv files you need to have MKVToolnix and FFprobe</li>
@@ -40,6 +40,14 @@
     <li>More User Settings</li>
 </ul>
 <h2>ChangeLogs</h2>
+<h4>Version 1.0.5</h4>
+<ul>
+    <li>Use pysub2 instead of my regex, as its much more accurate than my regex</li>
+    <li>improvement of tag recognition as I use pysub2 now, it should be almost perfect</li>
+    <li>fixed issue in batch</li>
+    <li>fixed issue in tag text viewer</li>
+    <li>better Installer, better inno installer script used to make installer</li>
+</ul>
 <h4>Version 1.0.4</h4>
 <ul>
     <li>Windows path limitation had been fixed</li>

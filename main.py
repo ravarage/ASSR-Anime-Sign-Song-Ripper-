@@ -19,6 +19,8 @@ mkvmergingdict = {}
 tagtoremove = []
 tagfound = []
 mkvfilesload = []
+import pysubs2
+from time import strftime,gmtime
 from textbrowser import Ui_MainWindow as textbrowserloader
 import traceback
 from PyQt5.QtCore import pyqtSignal
@@ -152,7 +154,17 @@ class runable2(QtCore.QRunnable):
         self.kwargs = kwargs
         self.signals = WorkerSignals()
     def anotherthread(self):
+        print("Make it here")
+        read = str(self.args[1])
+        write = str(self.args[2])
+        print(read,write)
 
+        data = pysubs2.load(str(read))
+        for lines in data:
+            linetag = str(lines.style).strip()
+            if any(x == linetag for x in tagtoremove):
+                lines.text = ""
+        data.save(write)
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         CREATE_NO_WINDOW = 0x08000000
@@ -270,46 +282,40 @@ class textbrowserclass(QtWidgets.QMainWindow):
         else:
             mes = self.ui.treeWidget.model().index(ase, 0)
             first_cell_selected = self.ui.treeWidget.model().data(mes, QtCore.Qt.DisplayRole)
-            data = open(str(file), mode='r', encoding="utf-8")
-            readdata = data.readlines()
-            for line in readdata:
-                regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
-                try:
-                    tag = str(regex.group(1)).strip()
-                except:
-                    pass
-                else:
-                    if tag == first_cell_selected:
-                        readline = re.search(r"^Dialogue:\s\d+,(\d+:\d+:\d+\.\d+),(\d+:\d+:\d+\.\d+),.*?,,.*?,.*?,.*?,,(.*)",line)
-                        try:
-                            start = readline.group(1).strip()
-                            end = readline.group(2).strip()
-                            text = readline.group(3).strip()
-                        except:
-                            pass
-                        else:
-                            fullline = str(start) + ", " + str(end) + ", " + text + "\n"
-                            readlines = readlines + fullline
+            data =pysubs2.load(str(file))
+
+            for line in data:
+                tag = str(line.style).strip()
+                if tag == first_cell_selected:
+                    start = str(strftime("%H:%M:%S", gmtime(line.start/1000)))
+                    end = str(strftime("%H:%M:%S", gmtime(line.end/1000)))
+                    text = str(line.text)
+                    fullline = str(start) + ", " + str(end) + ", " + text + "\n"
+                    readlines = readlines + fullline
+
+
+
         self.ui.textBrowser.setText(readlines)
 
 
     def tagfinder(self,file):
-        data = open(str(file), mode='r', encoding="utf-8")
-        readdata = data.readlines()
-        for line in readdata:
-            regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),", line)
-            try:
-                tag = str(regex.group(1)).strip()
-            except:
-                pass
-            else:
-                if tag not in self.tagfounds:
-                    self.tagfounds.append(tag)
-                    item = QtWidgets.QTreeWidgetItem([tag,tag])
-                    self.ui.treeWidget.addTopLevelItem(item)
+        data = pysubs2.load(str(file))
 
-    tagfound.sort()
+
+        for line in data:
+            tag = str(line.style).strip().strip()
+
+            if tag not in self.tagfounds:
+                self.tagfounds.append(tag)
+                item = QtWidgets.QTreeWidgetItem([tag, tag])
+                self.ui.treeWidget.addTopLevelItem(item)
+        self.tagfounds.sort()
+
+
+
+
     def __init__(self,file):
+        self.tagfounds.clear()
         super(textbrowserclass, self).__init__()
         self.ui = textbrowserloader()
         self.ui.setupUi(self)
@@ -318,7 +324,9 @@ class textbrowserclass(QtWidgets.QMainWindow):
         self.ui.treeWidget.hideColumn(0)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tagfinder(file)
+
         self.ui.treeWidget.doubleClicked.connect(lambda :self.tagreader(file))
+        self.tagfinder(file)
 
 class settingclass(QtWidgets.QMainWindow):
 
@@ -503,22 +511,6 @@ class tagtokeepclass(QtWidgets.QMainWindow):
 
 class frontdashclass(QtWidgets.QMainWindow):
 
-
-    def rippingdata(self):
-
-        try:
-            self.extracing.isAlive()
-        except:
-            try:
-                self.rippingthread()
-            except:pass
-        else:
-            while self.extracing.isAlive():
-                QtWidgets.QMessageBox.about(self, "Warning",
-                                            "Extracting Ass file from mkv files is not finished yet try again in a few")
-            else:
-
-                self.rippingthread()
     def checker(self):
 
         if len(self.done) == len(assfiles):
@@ -539,44 +531,42 @@ class frontdashclass(QtWidgets.QMainWindow):
         a = subprocess.run(mkvstring)
         self.done.append(mkvstring)
     u = 0
+
+    def anotherthread(self,read,write):
+        data = pysubs2.load(str(read))
+        for lines in data:
+            linetag = str(lines.style).strip()
+            if any(x == linetag for x in tagtoremove):
+                lines.text = ""
+        data.save(write)
     def rippingthread(self):
+        self.tgread = QtCore.QThreadPool()
+        self.outuu = 0
         self.uu = 0
         QtWidgets.QMessageBox.about(self, "started", "All operations started wait till you get done signal")
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.checker)
-        self.timer.start(1000)
+
         self.loadingwindows=loadingwin()
         self.loadingwindows.hide()
 
 
 
         for file in assfiles:
+            self.outuu =self.outuu+ 1
             if file in mkvfilesload:
+
                 self.loadingwindows.show()
                 temp = gettempdir()
-                newnewfile = temp + "\\" + str(self.u) + ".ass"
+                newnewfile = temp + "\\" + str(self.outuu) + ".ass"
                 self.u =+ 1
+
+
                 createdfiles.append(newnewfile)
                 try:
                     os.remove(newnewfile)
                 except:
                     pass
 
-                with open(str(file), mode='r', encoding="utf-8") as data:
-                    for lines in data:
-                        liness = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",lines)
-                        try:
-                            linetag = liness.group(1).strip()
-                        except:
-                            linetag = "Not dialoge"
-                        else:
-                            linetag = liness.group(1).strip()
-                        if any(x == linetag for x in tagtoremove):
 
-                            pass
-                        else:
-                            with open(str(newnewfile), mode='a', encoding="utf-8") as newdata:
-                                newdata.write(lines)
                 mkvfile = mkvmergingdict.get(file)
                 mkvfilename = str(mkvfile)[int(str(mkvfile).rfind("/") + 1):]
                 index = str(mkvfile).rfind(mkvfilename)
@@ -585,7 +575,7 @@ class frontdashclass(QtWidgets.QMainWindow):
                 mkvnew = '"' + folder+  "/"+"out"+ "/"+mkvfilename + '"'
                 oldmkv = '"'+mkvfile +'"'
                 newsub = '"' + newnewfile + '"'
-                print(mkvnew)
+
                 if len(mkvnew) > 254:
                     outdir = '"'+ folder[0] + ":/ASSR" +'"'
                     QtWidgets.QMessageBox.about(self,"Warning","output folder exceed windows path limit \nOutput files will be in {}".format(outdir))
@@ -604,8 +594,8 @@ class frontdashclass(QtWidgets.QMainWindow):
                 self.mkvmerge = str(config['MKVToolNix location']['dir']) + r"\mkvmerge"
 
                 mkvstring = "{} -o {} {} --default-track 0 --track-name 0:ASSR {}  --default-language eng".format(self.mkvmerge,mkvnew, oldmkv, newsub)
-                self.tgread = QtCore.QThreadPool()
-                worker = runable2(mkvstring)
+
+                worker = runable2(mkvstring,file,newnewfile)
                 worker.signals.result.connect(self.print_output)
                 worker.signals.finished.connect(self.thread_complete2)
                 self.tgread.start(worker)
@@ -631,13 +621,14 @@ class frontdashclass(QtWidgets.QMainWindow):
                 except:
                     pass
 
-                with open(str(file), mode='r', encoding="utf-8") as data:
-                    for lines in data:
-                        if any(x in lines for x in tagtoremove):
-                            pass
-                        else:
-                            with open(str(newnewfile), mode='a', encoding="utf-8") as newdata:
-                                newdata.write(lines)
+                data = pysubs2.load(str(file))
+                for lines in data:
+                    linetag = str(lines.style).strip()
+                    if any(x == linetag for x in tagtoremove):
+                        lines.text = ""
+                    else:
+                        pass
+                data.save(newnewfile)
 
 
 
@@ -659,18 +650,14 @@ class frontdashclass(QtWidgets.QMainWindow):
 
         for i in assfiles:
 
-            data =  open(str(i),mode='r',encoding="utf-8")
-            readdata = data.readlines()
-            for line in readdata:
-                regex = re.search(r"Dialogue:.*?,.*?,.*?,(.*?),",line)
-                try:
-                    tag = str(regex.group(1)).strip()
-                except:
-                    pass
-                else:
-                    if  tag not in tagfound:
-                        if tag not in tagtoremove:
-                            tagfound.append(tag)
+            data = pysubs2.load(str(i))
+
+            for line in data:
+                tag = str(line.style).strip().strip()
+                if tag not in tagfound:
+                    if tag not in tagtoremove:
+                        tagfound.append(tag)
+
         tagfound.sort()
 
 
@@ -748,7 +735,7 @@ class frontdashclass(QtWidgets.QMainWindow):
     def doit(self,i):
         temp = str(gettempdir())
         file = temp + "\\" + "temp.bat"
-        outfile = temp + "\\" + "temp.txt"
+        outfile = temp + "\\" + "temp.ass"
         extractingstring = '{}  -loglevel error -select_streams s  -show_entries stream=index:stream -of _tags=language,title,codec_type -of csv=p=0  -i "{}" > {}'.format(
             self.ffprobe, i, outfile)
         with open(file, "w")as me:
@@ -788,13 +775,13 @@ class frontdashclass(QtWidgets.QMainWindow):
         except:pass
     def thread_complete2(self):
 
-        self.uu += 1
+        self.uu = self.uu +  1
         if len(mkvfiles) == self.uu:
             self.loadingwindows.close()
             QtWidgets.QMessageBox.about(self,"Done","All merging mkv file done successfully")
     def thread_complete(self):
 
-        self.uu += 1
+        self.uu = self.uu + 1
         if len(mkvfiles) == self.uu:
             self.loadingwindows.close()
             QtWidgets.QMessageBox.about(self,"Done","All subtitle read successfully")
@@ -809,8 +796,8 @@ class frontdashclass(QtWidgets.QMainWindow):
         streamid = str(search.group(1)).strip()
 
         filename = str(i)[int(str(i).rfind("/") + 1):]
-        newfile = '"'+temp + "\\" + filename + ".txt"+'"'
-        newfiles = temp + "\\" +  filename + ".txt"
+        newfile = '"'+temp + "\\" + filename + ".ass"+'"'
+        newfiles = temp + "\\" +  filename + ".ass"
 
         forextract2 = '"' + self.mkvextract + '" '+'"' + i +'"'+ " tracks " + str(streamid) + ":" + newfile
 
@@ -1006,7 +993,7 @@ class frontdashclass(QtWidgets.QMainWindow):
         self.ui.pushButton_6.clicked.connect(self.tagtokeeploader)
         self.ui.pushButton_7.clicked.connect(self.tagtoremoveloader)
         self.ui.pushButton_3.clicked.connect(self.removeselectedfile)
-        self.ui.pushButton_5.clicked.connect(self.rippingdata)
+        self.ui.pushButton_5.clicked.connect(self.rippingthread)
         self.ui.pushButton_4.clicked.connect(self.settingloader)
         self.setStatusTip("Ready")
 
@@ -1094,8 +1081,9 @@ class frontdashclass(QtWidgets.QMainWindow):
 
 
 def handler(msg_type, msg_log_context, msg_string):
+
+    print(msg_type, msg_log_context, msg_string)
     pass
-    #print(msg_type, msg_log_context, msg_string)
 QtCore.qInstallMessageHandler(handler)
 if __name__ == "__main__":
   

@@ -24,7 +24,7 @@
 <h2>Coding details</h2>
 <ul>
     <li>The Software Written in Python</li>
-    <li>Library Used PYQT5(GUI) and PySub2</li>
+    <li>Library Used PYQT5(GUI),MPV and PySub2</li>
     <li>Free and Open Source</li>
     <li>Windows Binary made Using Nutika with Mingw64</li>
     <li>to Work with mkv files you need to have MKVToolnix and FFprobe</li>
@@ -40,6 +40,10 @@
     <li>More User Settings</li>
 </ul>
 <h2>ChangeLogs</h2>
+<h4>Version 1.0.6</h4>
+<ul>
+    <li>Text browser now support playing video with mpv using libmpv</li>
+</ul>
 <h4>Version 1.0.5</h4>
 <ul>
     <li>Use pysub2 instead of my regex, as its much more accurate than my regex</li>

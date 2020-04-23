@@ -38,9 +38,10 @@ open C:\Users\Your User\ASSR Setting\asscconfig.ini
 and add this line and save it
 [ffprobe location]
             
-            dir = C:\Program Files\MKVToolNix</code></li></li>
+dir = C:\Program Files\MKVToolNix</code></li></li>
     </ul>
-    <li>when you open a new file it rescan all opened files</li>
+   <li>when you open a new file it rescan all opened files</li>
+   
 </ul>
 <h2>ToDO</h2>
 <ul>

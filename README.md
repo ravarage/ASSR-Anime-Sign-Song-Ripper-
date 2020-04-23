@@ -31,7 +31,16 @@
 </ul>
 <h2>Known Bugs</h2>
 <ul>
-    <li>Not That I know of</li>
+    <li>The application wont open
+    <ul>
+        <li><code>Temporary solution
+open C:\Users\Your User\ASSR Setting\asscconfig.ini
+and add this line and save it
+[ffprobe location]
+            
+            dir = C:\Program Files\MKVToolNix</code></li></li>
+    </ul>
+    <li>when you open a new file it rescan all opened files</li>
 </ul>
 <h2>ToDO</h2>
 <ul>

@@ -31,17 +31,7 @@
 </ul>
 <h2>Known Bugs</h2>
 <ul>
-    <li>The application wont open
-    <ul>
-        <li><code>Temporary solution
-open C:\Users\Your User\ASSR Setting\asscconfig.ini
-and add this line and save it
-[ffprobe location]
-            
-dir = C:\Program Files\MKVToolNix</code></li></li>
-    </ul>
-   <li>when you open a new file it rescan all opened files</li>
-   
+    <li>Nothin that I know of</li>
 </ul>
 <h2>ToDO</h2>
 <ul>
@@ -50,6 +40,11 @@ dir = C:\Program Files\MKVToolNix</code></li></li>
     <li>More User Settings</li>
 </ul>
 <h2>ChangeLogs</h2>
+<h4>Version 1.0.7</h4>
+<ul>
+    <li>Fixing Issue1 the app not starting https://github.com/ravarage/ASSR-Anime-Sign-Song-Ripper-/issues/1</li>
+    <li>when you load a file it rescan all the loaded files, now it only scan new files</li>
+</ul>
 <h4>Version 1.0.6</h4>
 <ul>
     <li>Text browser now support playing video with mpv using libmpv</li>
